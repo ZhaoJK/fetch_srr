@@ -1,0 +1,7 @@
+LOCAL:
+    WORKDIR: /localscratch/user/jiakuan.zhao/kingfisher/ 
+    GLOBAL_TMPDIR: /luster/scratch/user/jiakuan.zhao/tmp 
+    LOCAL_TMPDIR: /localscratch/user/jiakuan.zhao/tmp 
+    R_TMPDIR: /localscratch/user/jiakuan.zhao/tmp/r
+    EMAIL: jiakuan.zhao@helmholtz-munich.de 
+    JOB_LABEL: Retriever 

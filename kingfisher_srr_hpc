@@ -1,0 +1,41 @@
+import os
+import pandas as pd
+import logging
+
+proj_id = "PRJNA730093"
+work_dir = "/lustre/scratch/users/jiakuan.zhao/" + proj_id + "_raw/"
+if not os.path.exists(work_dir):
+    os.makedirs(work_dir)
+os.chdir(work_dir)
+
+kingfisher_path = "/home/cpc/jiakuan.zhao/snakemake/kingfisher_3.1.sif"
+
+
+url = "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=" + proj_id + "&result=read_run&fields=study_accession,run_accession,tax_id,experiment_title&format=tsv&download=true&limit=0"
+srr_data = pd.read_csv(url, sep='\t')
+srr_data.to_csv(os.path.join(work_dir, "srr_meta.tsv"), sep='\t', index=False)
+
+sra_identifiers = srr_data["run_accession"].tolist()
+logging.debug("Found {} run(s) to annotate".format(len(sra_identifiers)))
+
+rule all:
+    input:
+        #downloaded fastq.gz files
+        expand('{srr_sample}_{id}.fastq.gz', srr_sample = sra_identifiers, id = [1,2])
+
+
+rule download_one_srr:
+    input: 
+        work_dir = work_dir,
+        kingfisher = kingfisher_path
+    output: 
+        '{run_id}_1.fastq.gz', '{run_id}_2.fastq.gz'
+    shell:
+        """
+        cd  {input.work_dir} 
+        singularity run {input.kingfisher} get -r {wildcards.run_id}  -m aws-http  aws-cp -f fastq.gz
+        """
+
+
+    
+
